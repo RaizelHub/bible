@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+const source = 'build/app/outputs/flutter-apk/app-release.apk';
+const bytes = fs.readFileSync(source);
+if (bytes.length >= 100 * 1024 * 1024) throw new Error('APK exceeds GitHub file limit; use split APKs or a GitHub Release.');
+const pubspec=fs.readFileSync('pubspec.yaml','utf8');
+const version=pubspec.match(/^version:\s*([^+\s]+)\+(\d+)/m);
+if(!version) throw new Error('Missing version');
+fs.mkdirSync('docs/downloads',{recursive:true});
+fs.copyFileSync(source,'docs/downloads/Stillword-android.apk');
+fs.writeFileSync('docs/downloads/release.json',JSON.stringify({version:version[1],build:Number(version[2]),size:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),file:'Stillword-android.apk',signing:'development-preview'},null,2)+'\n');
+console.log(`Packaged Stillword ${version[1]}: ${(bytes.length/1048576).toFixed(1)} MiB`);
