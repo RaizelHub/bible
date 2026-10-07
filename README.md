@@ -98,7 +98,9 @@ To reproduce the generated library, download that upstream JSON to `tool/source/
 
 ## Validation limits
 
-Unit and widget tests cover all 365 unique readings, exhaustion without wraparound, daylight-saving scheduling, legacy bookmark IDs, disabling notifications, denied permissions, and changing times without resending elapsed readings. Browser checks exercise the landing page at desktop and phone sizes. Real-device notification delivery and iOS builds still need device validation.
+Nine unit and widget tests cover all 365 unique readings, exhaustion without wraparound, daylight-saving scheduling, legacy bookmark IDs, disabling notifications, denied permissions, changing times without resending elapsed readings, and Windows queue refresh/activation. Browser checks exercise the landing page and Windows guide at desktop and phone sizes. The Windows release compiled successfully; its installer and activation registration passed installation checks on GitHub's Windows runner. The native app rendered on Windows 11, and a real OS queue check confirmed scheduling, persistence after the scheduling process exits, and individual cancellation. Banner visibility and native notification-click activation still need an interactive user check; iOS builds remain unverified.
+
+To repeat the native Windows queue check, run `python tool/windows/check-notification-queue.py build/windows/x64/runner/Release`. It uses a unique temporary test app ID and two far-future reminders, then cancels them and removes its test registration. It does not display a banner or modify Stillword's reading history.
 
 ## Free iPhone Home Screen edition
 
