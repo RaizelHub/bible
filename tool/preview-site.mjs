@@ -2,7 +2,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 const root = path.resolve('docs');
-const types = {'.html':'text/html', '.css':'text/css', '.js':'application/javascript', '.json':'application/json', '.png':'image/png', '.ttf':'font/ttf', '.apk':'application/vnd.android.package-archive'};
+const types = {'.html':'text/html', '.css':'text/css', '.js':'application/javascript', '.json':'application/json', '.png':'image/png', '.ttf':'font/ttf', '.wasm':'application/wasm', '.otf':'font/otf', '.apk':'application/vnd.android.package-archive'};
 const server = http.createServer((req,res)=>{
   let request;
   try { request = decodeURIComponent(new URL(req.url,'http://localhost').pathname); } catch { res.writeHead(400).end(); return; }

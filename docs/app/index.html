@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="/bible/app/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Stillword for iPhone: fresh daily scripture and saved verses, ready for your Home Screen.">
+  <meta name="theme-color" content="#f8f7f2">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Stillword">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Stillword for iPhone</title>
+  <style>
+    html,body{height:100%;margin:0;background:#f8f7f2;color:#243e36;font:12px/1.6 system-ui,sans-serif}
+    body{display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box}
+    #app-status{padding:7px 16px;border-bottom:1px solid #e5e7dd;display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;font-size:10px;background:#eef0e7}
+    #app-status a{color:#243e36;font-weight:600;white-space:nowrap}
+    #app-host{flex:1;min-height:0;width:100%;position:relative;overflow:hidden}
+    #loading{position:absolute;inset:0;display:grid;place-content:center;gap:16px;text-align:center;padding:28px;z-index:2;background:#f8f7f2}
+    #loading img{width:60px;height:60px;border-radius:16px;margin:auto}#loading h1{font:32px Georgia,serif;margin:0}#loading p{color:#64705e;margin:0}
+    #retry{padding:12px;border:1px solid #243e36;border-radius:8px;background:transparent;color:#243e36;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div id="app-status"><span id="offline-state" role="status">Preparing offline reading…</span><a href="../iphone.html">iPhone setup</a></div>
+  <div id="app-host"><div id="loading"><img src="icons/Icon-192.png" alt=""><h1>stillword</h1><p id="loading-message">Making room for a little grace.</p><button id="retry" hidden onclick="location.reload()">Try again</button></div></div>
+  <noscript>Enable JavaScript to open Stillword.</noscript>
+  <script src="offline.js"></script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

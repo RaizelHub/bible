@@ -63,6 +63,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto.ttf
     - family: Lora
       fonts:
         - asset: assets/fonts/Lora.ttf

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -716,175 +717,241 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       ),
     ],
   );
-  Widget settings() => Column(
+  Widget webSettings() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      eyebrow('SPACE FOR THE SACRED'),
+      eyebrow('STILLWORD FOR IPHONE'),
       const SizedBox(height: 12),
-      heading('Find your rhythm.'),
+      heading('A little grace,\nalways close.'),
+      const SizedBox(height: 22),
+      const Icon(Icons.add_to_home_screen_rounded, size: 34),
+      const SizedBox(height: 16),
+      heading('Add to your Home Screen', 23),
       const SizedBox(height: 12),
       const Text(
-        'Three gentle invitations to pause, reflect, and reconnect with His word.',
-        style: TextStyle(color: muted, height: 1.7, fontSize: 14),
+        'Open this app in Safari. Tap Share, then Add to Home Screen. Keep Open as Web App enabled if shown, and tap Add.',
+        style: TextStyle(height: 1.8),
       ),
-      const SizedBox(height: 26),
-      if (reminders.queuedThrough != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(
-            'Fresh verses queued through ${DateFormat('MMM d').format(reminders.queuedThrough!)}. Opening Stillword refills your reminders.',
-            style: const TextStyle(color: muted, height: 1.6, fontSize: 12),
-          ),
-        ),
-      if (problem != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(
-            problem!,
-            style: const TextStyle(color: Color(0xFF995C3C)),
-          ),
-        ),
-      ...List.generate(
-        3,
-        (i) => Container(
-          margin: const EdgeInsets.only(bottom: 15),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: line),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(periodIcons[i]),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      periods[i],
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  Switch(
-                    value: enabled[i],
-                    onChanged: loaded && !busy
-                        ? (value) {
-                            final next = List<bool>.of(enabled);
-                            next[i] = value;
-                            updateReminders(next, List.of(times));
-                          }
-                        : null,
-                  ),
-                ],
-              ),
-              const Divider(),
-              Row(
-                children: [
-                  const Icon(Icons.schedule_rounded, size: 17, color: muted),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text(
-                      'A moment for you',
-                      style: TextStyle(fontSize: 12, color: muted),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: !loaded || busy
-                        ? null
-                        : () async {
-                            final picked = await showTimePicker(
-                              context: context,
-                              initialTime: times[i],
-                            );
-                            if (picked == null || !mounted) return;
-                            final next = List<TimeOfDay>.of(times);
-                            next[i] = picked;
-                            await updateReminders(List.of(enabled), next);
-                          },
-                    child: Text(times[i].format(context)),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+      const SizedBox(height: 24),
+      heading('Read at your own pace', 23),
+      const SizedBox(height: 12),
+      const Text(
+        '365 unique KJV readings, with morning, afternoon, and night moments. Save verses to revisit them. Once the status above says Ready offline, you can read without internet. Your reading plan and bookmarks stay in this browser or installed web app; they do not sync between devices.',
+        style: TextStyle(height: 1.8),
       ),
-      const SizedBox(height: 8),
-      SizedBox(
-        width: double.infinity,
-        child: FilledButton.icon(
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.all(18),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
-          onPressed: loaded && !busy
-              ? () => updateReminders([true, true, true], List.of(times))
-              : null,
-          icon: busy
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.notifications_active_outlined, size: 19),
-          label: Text(busy ? 'Setting your rhythm…' : 'Enable all reminders'),
-        ),
-      ),
-      const SizedBox(height: 8),
-      Center(
-        child: TextButton.icon(
-          onPressed: loaded && !busy
-              ? () async {
-                  if (!reminders.supported) {
-                    message(
-                      'Notification previews are available on Android and iPhone.',
-                    );
-                    return;
-                  }
-                  try {
-                    if (current == null) {
-                      message('This reading collection is complete.');
-                      return;
-                    }
-                    await reminders.preview(current!);
-                    message('A sample verse notification has been sent.');
-                  } catch (_) {
-                    message(
-                      'Could not send a preview. Check notification permission in phone settings.',
-                    );
-                  }
-                }
-              : null,
-          icon: const Icon(Icons.send_outlined, size: 17),
-          label: const Text('Send a test notification'),
-        ),
-      ),
-      const SizedBox(height: 22),
+      const SizedBox(height: 24),
       Container(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: const Color(0xFFEDEFE6),
           borderRadius: BorderRadius.circular(18),
         ),
-        child: const Row(
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.info_outline_rounded, size: 19, color: muted),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                '365 fresh KJV verses. Each daily moment has its own verse, with no automatic repeats. The collection finishes after 122 days at three readings per day. Reopen Stillword at least every 20 days to refill your offline notifications. Android delivery may be a little later; banners follow your phone settings.',
-                style: TextStyle(color: muted, fontSize: 12, height: 1.8),
-              ),
+            Icon(Icons.notifications_off_outlined),
+            SizedBox(height: 12),
+            Text(
+              'No scheduled notifications in the web app',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'This free iPhone edition supports reading and bookmarks. It cannot send morning, afternoon, or night alerts while closed. Scheduled alerts are available in the native Android download.',
+              style: TextStyle(height: 1.8),
             ),
           ],
         ),
       ),
       const SizedBox(height: 24),
-      Center(child: eyebrow('STILLWORD · A DAILY PRACTICE OF GRACE')),
+      const Text(
+        'Your daily reading calendar runs for 122 days and never restarts automatically. Clearing browser data may remove your reading progress, bookmarks, and offline files. Your iPhone may also clear cached files when storage is low; reopen online to prepare them again.',
+        style: TextStyle(color: muted, height: 1.8, fontSize: 12),
+      ),
     ],
   );
+
+  Widget settings() => kIsWeb
+      ? webSettings()
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            eyebrow('SPACE FOR THE SACRED'),
+            const SizedBox(height: 12),
+            heading('Find your rhythm.'),
+            const SizedBox(height: 12),
+            const Text(
+              'Three gentle invitations to pause, reflect, and reconnect with His word.',
+              style: TextStyle(color: muted, height: 1.7, fontSize: 14),
+            ),
+            const SizedBox(height: 26),
+            if (reminders.queuedThrough != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(
+                  'Fresh verses queued through ${DateFormat('MMM d').format(reminders.queuedThrough!)}. Opening Stillword refills your reminders.',
+                  style: const TextStyle(
+                    color: muted,
+                    height: 1.6,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            if (problem != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(
+                  problem!,
+                  style: const TextStyle(color: Color(0xFF995C3C)),
+                ),
+              ),
+            ...List.generate(
+              3,
+              (i) => Container(
+                margin: const EdgeInsets.only(bottom: 15),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: line),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(periodIcons[i]),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            periods[i],
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        Switch(
+                          value: enabled[i],
+                          onChanged: loaded && !busy
+                              ? (value) {
+                                  final next = List<bool>.of(enabled);
+                                  next[i] = value;
+                                  updateReminders(next, List.of(times));
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.schedule_rounded,
+                          size: 17,
+                          color: muted,
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'A moment for you',
+                            style: TextStyle(fontSize: 12, color: muted),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: !loaded || busy
+                              ? null
+                              : () async {
+                                  final picked = await showTimePicker(
+                                    context: context,
+                                    initialTime: times[i],
+                                  );
+                                  if (picked == null || !mounted) return;
+                                  final next = List<TimeOfDay>.of(times);
+                                  next[i] = picked;
+                                  await updateReminders(List.of(enabled), next);
+                                },
+                          child: Text(times[i].format(context)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.all(18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onPressed: loaded && !busy
+                    ? () => updateReminders([true, true, true], List.of(times))
+                    : null,
+                icon: busy
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.notifications_active_outlined, size: 19),
+                label: Text(
+                  busy ? 'Setting your rhythm…' : 'Enable all reminders',
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Center(
+              child: TextButton.icon(
+                onPressed: loaded && !busy
+                    ? () async {
+                        if (!reminders.supported) {
+                          message(
+                            'Notification previews are available on Android and iPhone.',
+                          );
+                          return;
+                        }
+                        try {
+                          if (current == null) {
+                            message('This reading collection is complete.');
+                            return;
+                          }
+                          await reminders.preview(current!);
+                          message('A sample verse notification has been sent.');
+                        } catch (_) {
+                          message(
+                            'Could not send a preview. Check notification permission in phone settings.',
+                          );
+                        }
+                      }
+                    : null,
+                icon: const Icon(Icons.send_outlined, size: 17),
+                label: const Text('Send a test notification'),
+              ),
+            ),
+            const SizedBox(height: 22),
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDEFE6),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 19, color: muted),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '365 fresh KJV verses. Each daily moment has its own verse, with no automatic repeats. The collection finishes after 122 days at three readings per day. Reopen Stillword at least every 20 days to refill your offline notifications. Android delivery may be a little later; banners follow your phone settings.',
+                      style: TextStyle(color: muted, fontSize: 12, height: 1.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Center(child: eyebrow('STILLWORD · A DAILY PRACTICE OF GRACE')),
+          ],
+        );
 }

@@ -8,3 +8,6 @@
 *.apk binary
 *.png binary
 *.ttf binary
+# Generated web build: preserve exact bytes and review its source under web/.
+docs/app/** -text -diff -whitespace
+assets/fonts/*-OFL.txt -whitespace

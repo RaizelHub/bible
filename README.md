@@ -32,7 +32,7 @@ flutter analyze
 flutter build apk --release
 ```
 
-The Android download is a **development-signed preview**. The current Gradle release configuration uses the local debug key; use a persistent private release key before public production distribution. APK updates require the same signing key. iOS source is included, but iPhone compilation and signing require macOS / Xcode; there is no iPhone download yet.
+The Android download is a **development-signed preview**. The current Gradle release configuration uses the local debug key; use a persistent private release key before public production distribution. APK updates require the same signing key. iOS source is included, but iPhone compilation and signing require macOS / Xcode; there is no native iPhone download. A free Home Screen web edition is available; see below.
 
 ## Website and GitHub Pages
 
@@ -81,3 +81,22 @@ To reproduce the generated library, download that upstream JSON to `tool/source/
 ## Validation limits
 
 Unit and widget tests cover all 365 unique readings, exhaustion without wraparound, daylight-saving scheduling, legacy bookmark IDs, disabling notifications, denied permissions, and changing times without resending elapsed readings. Browser checks exercise the landing page at desktop and phone sizes. Real-device notification delivery and iOS builds still need device validation.
+
+## Free iPhone Home Screen edition
+
+The live site includes `iphone.html` with Safari installation instructions and the Flutter web build at `/bible/app/`. This is a free installable web app, not an IPA or App Store download. It supports the same 365-reading plan, bookmarks, copying verses, and offline reading after the status says **Ready offline**.
+
+**Scheduled notifications are not available in this edition.** GitHub Pages serves static files and does not send background push notifications. The iPhone web app does not present notification switches or permission prompts. Native Android reminders remain available in the APK.
+
+Open `https://raizelhub.github.io/bible/app/` in Safari on an iPhone, wait for offline setup, then use **Share → Add to Home Screen**, keep **Open as Web App** on if shown, and tap **Add**. Open the installed icon to begin your plan and save verses. Browser and installed-app storage may be separate; there is no device sync. Clearing website data removes local progress. iOS may evict cached files under storage pressure; revisit online if offline startup stops working.
+
+To update this edition:
+
+```sh
+flutter build web --base-href /bible/app/ --no-web-resources-cdn --no-wasm-dry-run
+node tool/package-web.mjs
+```
+
+Commit the resulting `docs/app/` folder along with the app source. The custom service worker precaches the app, renderer, fonts, and assets only; it never downloads the Android APK. Its cache version is derived from build content, and new complete versions replace old app caches. It is scoped to `/bible/app/` so it does not intercept the landing page or other GitHub Pages projects.
+
+With the preview server running, `node tool/check-iphone.mjs` verifies installation links, standalone manifest, offline startup, saved-verse persistence after an offline reload, and absence of third-party network dependencies. This is browser automation, not a physical iPhone installation test.
