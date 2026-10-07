@@ -17,11 +17,15 @@ const defaultTimes = [
 ];
 
 class Reminders {
-  final plugin = FlutterLocalNotificationsPlugin();
+  Reminders({FlutterLocalNotificationsPlugin? plugin})
+    : plugin = plugin ?? FlutterLocalNotificationsPlugin();
+
+  final FlutterLocalNotificationsPlugin plugin;
   bool get supported =>
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS);
+          defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.windows);
   bool initialized = false;
   final ValueNotifier<int?> openedVerse = ValueNotifier(null);
 
@@ -29,7 +33,7 @@ class Reminders {
     if (!supported || initialized) return;
     database.initializeTimeZones();
     await updateTimezone();
-    await plugin.initialize(
+    final ready = await plugin.initialize(
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('ic_notification'),
         iOS: DarwinInitializationSettings(
@@ -37,12 +41,18 @@ class Reminders {
           requestBadgePermission: false,
           requestSoundPermission: false,
         ),
+        windows: WindowsInitializationSettings(
+          appName: 'Stillword',
+          appUserModelId: 'RaizelHub.Stillword',
+          guid: 'b4c2eb75-665d-4cb9-9a02-321f5ec40b47',
+        ),
       ),
       onDidReceiveNotificationResponse: (response) {
         openedVerse.value = null;
         openedVerse.value = int.tryParse(response.payload ?? '');
       },
     );
+    if (ready != true) throw StateError('Unable to initialize notifications');
     final launch = await plugin.getNotificationAppLaunchDetails();
     if (launch?.didNotificationLaunchApp ?? false) {
       openedVerse.value = int.tryParse(
@@ -60,6 +70,8 @@ class Reminders {
   Future<bool> permission() async {
     if (!supported) return false;
     await initialize();
+    // Windows controls banners in Settings; there is no runtime consent dialog.
+    if (defaultTargetPlatform == TargetPlatform.windows) return true;
     if (defaultTargetPlatform == TargetPlatform.android) {
       return await plugin
               .resolvePlatformSpecificImplementation<
@@ -91,6 +103,10 @@ class Reminders {
       presentAlert: true,
       presentSound: true,
       presentBanner: true,
+    ),
+    windows: const WindowsNotificationDetails(
+      subtitle: 'A moment for your soul · KJV',
+      duration: WindowsNotificationDuration.long,
     ),
   );
   DateTime? queuedThrough;
@@ -138,7 +154,13 @@ class Reminders {
     }
     final pending = await plugin.pendingNotificationRequests();
     for (final request in pending) {
-      if (!keep.contains(request.id)) await plugin.cancel(id: request.id);
+      // Windows AddToSchedule does not replace a toast with the same tag.
+      // Remove each existing scheduled toast before rebuilding the queue.
+      // The Windows plugin supports this even without MSIX package identity.
+      if (defaultTargetPlatform == TargetPlatform.windows ||
+          !keep.contains(request.id)) {
+        await plugin.cancel(id: request.id);
+      }
     }
     // Save the desired ledger before native writes: a partially failed batch
     // can skip a verse but can never silently duplicate an elapsed one.
@@ -180,6 +202,7 @@ class Reminders {
             priority: Priority.high,
           ),
           iOS: DarwinNotificationDetails(),
+          windows: WindowsNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
@@ -188,7 +211,7 @@ class Reminders {
 
   Future<void> preview(int index) async {
     if (!await permission()) {
-      throw StateError('Allow notifications in phone settings.');
+      throw StateError('Allow notifications in your device settings.');
     }
     await plugin.show(
       id: 100,

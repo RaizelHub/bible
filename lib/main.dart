@@ -188,14 +188,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   ) async {
     if (!loaded || busy) return;
     if (!reminders.supported) {
-      message('Install Stillword on Android or iPhone to receive reminders.');
+      message('Install the Android or Windows app to receive reminders.');
       return;
     }
     setState(() => busy = true);
     try {
       if (next.any((e) => e) && !await reminders.permission()) {
         message(
-          'Notifications are disabled. Allow Stillword in your phone notification settings.',
+          'Notifications are disabled. Allow Stillword in your device notification settings.',
         );
         return;
       }
@@ -757,7 +757,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             ),
             SizedBox(height: 8),
             Text(
-              'This free iPhone edition supports reading and bookmarks. It cannot send morning, afternoon, or night alerts while closed. Scheduled alerts are available in the native Android download.',
+              'This free iPhone edition supports reading and bookmarks. It cannot send morning, afternoon, or night alerts while closed. Scheduled alerts are available in the Android and Windows downloads.',
               style: TextStyle(height: 1.8),
             ),
           ],
@@ -907,7 +907,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     ? () async {
                         if (!reminders.supported) {
                           message(
-                            'Notification previews are available on Android and iPhone.',
+                            'Notification previews are available in the installed Android and Windows apps.',
                           );
                           return;
                         }
@@ -920,7 +920,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           message('A sample verse notification has been sent.');
                         } catch (_) {
                           message(
-                            'Could not send a preview. Check notification permission in phone settings.',
+                            'Could not send a preview. Check notification permission in device settings.',
                           );
                         }
                       }
@@ -936,15 +936,26 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                 color: const Color(0xFFEDEFE6),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Row(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 19, color: muted),
-                  SizedBox(width: 12),
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 19,
+                    color: muted,
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      '365 fresh KJV verses. Each daily moment has its own verse, with no automatic repeats. The collection finishes after 122 days at three readings per day. Reopen Stillword at least every 20 days to refill your offline notifications. Android delivery may be a little later; banners follow your phone settings.',
-                      style: TextStyle(color: muted, fontSize: 12, height: 1.8),
+                      (!kIsWeb &&
+                              defaultTargetPlatform == TargetPlatform.windows)
+                          ? 'Windows keeps your next 20 days of reminders even when this window is closed. Your PC must be on and awake. Allow Stillword in Windows Settings > System > Notifications; Do not disturb can silence banners. Reopen every 20 days and after a timezone change. Each reading is used once; the collection ends after 122 days.'
+                          : '365 fresh KJV verses. Each daily moment has its own verse, with no automatic repeats. The collection finishes after 122 days at three readings per day. Reopen Stillword at least every 20 days to refill your offline notifications. Android delivery may be a little later; banners follow your device settings.',
+                      style: const TextStyle(
+                        color: muted,
+                        fontSize: 12,
+                        height: 1.8,
+                      ),
                     ),
                   ),
                 ],

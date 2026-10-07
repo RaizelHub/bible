@@ -46,6 +46,9 @@ app.*.map.json
 
 # Locally packaged installation builds
 /artifacts/*.apk
+/artifacts/*.exe
+/artifacts/*.zip
+/artifacts/windows-preview/
 
 # Website browser QA tools
 /tool/browser/node_modules/

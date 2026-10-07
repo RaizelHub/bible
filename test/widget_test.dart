@@ -12,7 +12,7 @@ import 'package:stillword/main.dart';
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    debugDefaultTargetPlatformOverride = TargetPlatform.linux;
   });
   tearDown(() => debugDefaultTargetPlatformOverride = null);
   testWidgets('Save a verse and find it in the collection on a small phone', (
