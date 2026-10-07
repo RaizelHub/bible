@@ -7,7 +7,8 @@ try {
  const page=await browser.newPage({viewport:{width:1440,height:1100},deviceScaleFactor:1});
  const errors=[];
  page.on('pageerror',error=>errors.push(error.message));
- await page.goto('http://127.0.0.1:4173/bible/',{waitUntil:'networkidle'});
+ const base = process.env.SITE_URL || 'http://127.0.0.1:4173/bible/';
+ await page.goto(base,{waitUntil:'networkidle'});
  await page.evaluate(()=>document.fonts.ready);
  await page.evaluate(()=>Promise.all(document.getAnimations().map(a=>a.finished)));
  await page.screenshot({path:'artifacts/website-desktop.png',fullPage:true,animations:'disabled'});
@@ -40,5 +41,14 @@ try {
    assert.equal(await result.failure(),null);
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: responsive widths, preview tabs, keyboard navigation, FAQ, local links, available APK download, no page errors.');
+ await page.goto(base+'windows.html');
+ assert.equal(await page.locator('#windows-download').getAttribute('href'),'https://github.com/RaizelHub/bible/releases/download/windows-v1.2.0/Stillword-Windows-Setup.exe');
+ assert.match(await page.locator('main').innerText(),/on and awake/);
+ for (const width of [320,390,768,1440]) {
+   await page.setViewportSize({width,height:900});
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth),true,`Windows guide overflow at ${width}`);
+ }
+ await page.screenshot({path:'artifacts/windows-download-page.png',fullPage:true});
+ assert.deepEqual(errors,[]);
+ console.log('PASS: responsive landing/Windows guide, preview tabs, keyboard navigation, FAQ, local links, available APK download, no page errors.');
 } finally { await browser.close(); }

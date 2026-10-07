@@ -1,6 +1,6 @@
 # Stillword
 
-Flutter Bible verse app with a static Android download website, ready for GitHub Pages.
+Flutter Bible verse app for Android and Windows, with a free iPhone web edition and a GitHub Pages download website.
 
 ## App
 
@@ -16,7 +16,7 @@ The collection spans 122 calendar days (the final day has two readings). Disable
 
 ### Offline notifications
 
-Android and iOS have no unlimited built-in queue for different verses. Stillword schedules up to 60 **one-time** verse notifications over the next 20 days, plus one refill reminder. Every app open/resume refreshes the queue. Open the app at least every 20 days to continue receiving verses. No remote server, subscription, or internet connection is required.
+Stillword schedules up to 60 **one-time** verse notifications over the next 20 days, plus one refill reminder, on Android, native iOS, and Windows. Every app open/resume refreshes the queue. Open the app at least every 20 days to continue receiving verses. No remote server, subscription, or internet connection is required.
 
 Android uses inexact idle-allowed alarms, so delivery may be later than the chosen minute. Banner visibility depends on notification permission, Focus / Do Not Disturb, and battery settings. Reopen after a timezone change. The original weekly notifications are cancelled during upgrade.
 
@@ -31,6 +31,24 @@ flutter test
 flutter analyze
 flutter build apk --release
 ```
+
+### Windows desktop
+
+The Windows installer is linked from `docs/windows.html` and hosted in the repository's `windows-v1.2.0` GitHub release. It supports Windows 10 version 2004+ and Windows 11 x64. This preview is unsigned, so Windows may show an unknown publisher notice. No paid developer account, certificate installation, or administrator access is required for the per-user installer. Mac and Linux installers are not included.
+
+The desktop app has the same reading plan, bookmarks, and three adjustable daily times. Reminders are opt-in. Windows schedules the toasts in the OS and can deliver them after the app exits; the PC needs to be on and awake. Focus / Do not disturb and Windows notification settings affect banner visibility. Use **Rhythm → Send a test notification** after enabling reminders. There is no continuous background process or startup task. Reopen every 20 days to refill the queue and after timezone changes.
+
+`flutter_local_notifications_windows` 3.1.1 appends scheduled toasts with matching tags instead of replacing them. The scheduler cancels every pending Windows entry before rebuilding, preventing duplicates on reopen and time changes. Its native `cancelNotification` removes scheduled entries for unpackaged apps; the package-identity restriction applies to removing **already displayed** history. The installer registers the COM activation callback to reopen Stillword when a notification is clicked, and removes pending reminders on uninstall. A per-session mutex prevents two app instances from writing the same local reading history.
+
+To build locally, install Visual Studio with **Desktop development with C++**, the Windows SDK, and Inno Setup 6. Then run:
+
+```powershell
+flutter pub get
+flutter build windows --release
+./tool/windows/package.ps1 -Version 1.2.0
+```
+
+Alternatively, run **Build Windows desktop app** in GitHub Actions. It pins Flutter 3.44.6, analyzes and tests the code, builds the native app, bundles the redistributable Visual C++ runtime, compiles the installer, checks installation and callback registration, and publishes the preview release plus SHA-256 checksum. Bump the version in `pubspec.yaml` and update the website links for each new release. Windows notifications are registered under the stable `RaizelHub.Stillword` app ID; do not change that ID or its callback GUID for updates.
 
 The Android download is a **development-signed preview**. The current Gradle release configuration uses the local debug key; use a persistent private release key before public production distribution. APK updates require the same signing key. iOS source is included, but iPhone compilation and signing require macOS / Xcode; there is no native iPhone download. A free Home Screen web edition is available; see below.
 
