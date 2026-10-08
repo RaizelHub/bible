@@ -4,15 +4,27 @@ Flutter Bible verse app for Android and Windows, with a free iPhone web edition 
 
 ## App
 
+Version **1.3.0** adds everyday reading tools across Android, Windows, and the web edition:
+
+- Mark a verse as read and see the days you made time to read this week, without streak penalties.
+- Write, edit, or remove a private reflection alongside a verse. Reflections appear in Saved even without a bookmark.
+- Search kept verses by scripture text, reference, theme, or reflection, and filter by theme.
+- Select Standard, Larger, or Largest scripture text. Reading transitions respect the device's reduced-motion preference.
+- Choose **Once a day** (morning) or **Three moments** on native devices; pause all reminders with one button.
+- Continue through a full year of three daily readings. Every previously shipped verse ID and text is preserved; new readings are appended only.
+- The reading date rolls over while the app stays open. Notes, reading days, and preferences persist locally under `daily_practice_v1`.
+
+The website now has separate platform download cards, an everyday-use section, and `privacy.html` explaining local storage and public support. No account, backend, analytics, or cloud sync was added.
+
 - Animated cream-and-green UI with icons, bundled fonts, bookmarks, and verse copying.
 - Adjustable morning / afternoon / night reminders (7 AM, noon, 9 PM by default).
-- **365 unique new KJV verses, with no automatic repeats.** Each calendar day has three fixed reading slots. The sequence does not reset weekly, reshuffle on restart, or wrap after exhaustion.
+- **1,095 unique new KJV verses, with no automatic repeats.** Each calendar day has three fixed reading slots. The sequence does not reset weekly, reshuffle on restart, or wrap after exhaustion.
 - Local persistence keeps the plan's start date, bookmarks, and scheduled reminder history. Moving a reminder's time does not reissue an elapsed verse.
-- The previous 21 verse IDs remain available for existing bookmarks; the new plan skips all of those old readings.
+- The previous verse IDs remain available for existing bookmarks; the new plan skips all of those old readings.
 
 ### What “no repeats” means
 
-The collection spans 122 calendar days (the final day has two readings). Disabled and missed slots are skipped; disabling reminders does not pause the reading calendar. At the end, the app shows a completion message and stops verse reminders rather than repeating. Bookmarks and manually requested test notifications can intentionally show an existing verse. Reinstalling or clearing app data starts a new plan.
+The collection spans 365 calendar days with three reading slots per day. Disabled and missed slots are skipped; disabling reminders does not pause the reading calendar. At the end, the app shows a completion message and stops verse reminders rather than repeating. Bookmarks and manually requested test notifications can intentionally show an existing verse. Reinstalling or clearing app data starts a new plan.
 
 ### Offline notifications
 
@@ -34,7 +46,7 @@ flutter build apk --release
 
 ### Windows desktop
 
-The Windows installer is linked from `docs/windows.html` and hosted in the repository's `windows-v1.2.0` GitHub release. It supports Windows 10 version 2004+ and Windows 11 x64. This preview is unsigned, so Windows may show an unknown publisher notice. No paid developer account, certificate installation, or administrator access is required for the per-user installer. Mac and Linux installers are not included.
+The Windows installer is linked from `docs/windows.html` and hosted in the repository's `windows-v1.3.0` GitHub release. It supports Windows 10 version 2004+ and Windows 11 x64. This preview is unsigned, so Windows may show an unknown publisher notice. No paid developer account, certificate installation, or administrator access is required for the per-user installer. Mac and Linux installers are not included.
 
 The desktop app has the same reading plan, bookmarks, and three adjustable daily times. Reminders are opt-in. Windows schedules the toasts in the OS and can deliver them after the app exits; the PC needs to be on and awake. Focus / Do not disturb and Windows notification settings affect banner visibility. Use **Rhythm → Send a test notification** after enabling reminders. There is no continuous background process or startup task. Reopen every 20 days to refill the queue and after timezone changes.
 
@@ -45,7 +57,7 @@ To build locally, install Visual Studio with **Desktop development with C++**, t
 ```powershell
 flutter pub get
 flutter build windows --release
-./tool/windows/package.ps1 -Version 1.2.0
+./tool/windows/package.ps1 -Version 1.3.0
 ```
 
 Alternatively, run **Build Windows desktop app** in GitHub Actions. It pins Flutter 3.44.6, analyzes and tests the code, builds the native app, bundles the redistributable Visual C++ runtime, compiles the installer, checks installation and callback registration, and publishes the preview release plus SHA-256 checksum. Bump the version in `pubspec.yaml` and update the website links for each new release. Windows notifications are registered under the stable `RaizelHub.Stillword` app ID; do not change that ID or its callback GUID for updates.
@@ -92,19 +104,19 @@ For optional browser QA, install the pinned test tooling with `npm ci --prefix t
 
 ## Sources and maintenance
 
-`lib/verses.dart` includes stable IDs: never reorder entries once released. The new selections and source license are in `tool/source/`. KJV data comes from [thiagobodruk/bible](https://github.com/thiagobodruk/bible), `json/en_kjv.json`. The reference names are mapped to English; source book names were in Portuguese. Scripture text is preserved except for removing editorial brace annotations where present. The generator rejects duplicate normalized text and references, and produces 365 additional selections.
+`lib/verses.dart` includes stable IDs: never reorder entries once released. The new selections and source license are in `tool/source/`. KJV data comes from [thiagobodruk/bible](https://github.com/thiagobodruk/bible), `json/en_kjv.json`. The reference names are mapped to English; source book names were in Portuguese. Scripture text is preserved except for removing editorial brace annotations where present. The generator rejects duplicate normalized text and references, preserves the checked-in selections, and appends up to 1,095 selections. Never reorder or remove shipped entries.
 
 To reproduce the generated library, download that upstream JSON to `tool/source/en_kjv.json` and run `node tool/generate_verses.mjs`. Keep the checked-in selected list and stable IDs authoritative; review any upstream differences before replacing data. The full source download is ignored by Git. Font licenses are included alongside the bundled font files.
 
 ## Validation limits
 
-Nine unit and widget tests cover all 365 unique readings, exhaustion without wraparound, daylight-saving scheduling, legacy bookmark IDs, disabling notifications, denied permissions, changing times without resending elapsed readings, and Windows queue refresh/activation. Browser checks exercise the landing page and Windows guide at desktop and phone sizes. The Windows release compiled successfully; its installer and activation registration passed installation checks on GitHub's Windows runner. The native app rendered on Windows 11, and a real OS queue check confirmed scheduling, persistence after the scheduling process exits, and individual cancellation. Banner visibility and native notification-click activation still need an interactive user check; iOS builds remain unverified.
+Fourteen unit and widget tests cover all 1,095 unique readings, exhaustion without wraparound, daylight-saving scheduling, legacy bookmark IDs, disabling notifications, denied permissions, changing times without resending elapsed readings, and Windows queue refresh/activation. Browser checks exercise the landing page and Windows guide at desktop and phone sizes. The Windows release compiled successfully; its installer and activation registration passed installation checks on GitHub's Windows runner. The native app rendered on Windows 11, and a real OS queue check confirmed scheduling, persistence after the scheduling process exits, and individual cancellation. Banner visibility and native notification-click activation still need an interactive user check; iOS builds remain unverified.
 
 To repeat the native Windows queue check, run `python tool/windows/check-notification-queue.py build/windows/x64/runner/Release`. It uses a unique temporary test app ID and two far-future reminders, then cancels them and removes its test registration. It does not display a banner or modify Stillword's reading history.
 
 ## Free iPhone Home Screen edition
 
-The live site includes `iphone.html` with Safari installation instructions and the Flutter web build at `/bible/app/`. This is a free installable web app, not an IPA or App Store download. It supports the same 365-reading plan, bookmarks, copying verses, and offline reading after the status says **Ready offline**.
+The live site includes `iphone.html` with Safari installation instructions and the Flutter web build at `/bible/app/`. This is a free installable web app, not an IPA or App Store download. It supports the same 1,095-reading plan, bookmarks, copying verses, and offline reading after the status says **Ready offline**.
 
 **Scheduled notifications are not available in this edition.** GitHub Pages serves static files and does not send background push notifications. The iPhone web app does not present notification switches or permission prompts. Native Android reminders remain available in the APK.
 
@@ -120,3 +132,9 @@ node tool/package-web.mjs
 Commit the resulting `docs/app/` folder along with the app source. The custom service worker precaches the app, renderer, fonts, and assets only; it never downloads the Android APK. Its cache version is derived from build content, and new complete versions replace old app caches. It is scoped to `/bible/app/` so it does not intercept the landing page or other GitHub Pages projects.
 
 With the preview server running, `node tool/check-iphone.mjs` verifies installation links, standalone manifest, offline startup, saved-verse persistence after an offline reload, and absence of third-party network dependencies. This is browser automation, not a physical iPhone installation test.
+
+## Distribution status
+
+These downloadable builds are suitable for trying the app directly and remain clearly labeled previews. Android still uses the existing development signing key so current installs can update. Windows remains unsigned. Store publication and trusted production signing need the owner's signing credentials and platform setup. The free iPhone Home Screen edition still has no background notifications. Real-device notification banner delivery and click activation need interactive validation; automated queue tests do not establish those behaviors.
+
+All personal reflections and reading records stay on each device. They are not encrypted by Stillword and have no cloud backup or recovery. Users should not rely on browser storage as their only copy of irreplaceable notes.

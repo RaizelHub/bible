@@ -42,7 +42,7 @@ try {
  }
  assert.deepEqual(errors,[]);
  await page.goto(base+'windows.html');
- assert.equal(await page.locator('#windows-download').getAttribute('href'),'https://github.com/RaizelHub/bible/releases/download/windows-v1.2.0/Stillword-Windows-Setup.exe');
+ assert.equal(await page.locator('#windows-download').getAttribute('href'),'https://github.com/RaizelHub/bible/releases/download/windows-v1.3.0/Stillword-Windows-Setup.exe');
  assert.match(await page.locator('main').innerText(),/on and awake/);
  for (const width of [320,390,768,1440]) {
    await page.setViewportSize({width,height:900});
