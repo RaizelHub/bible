@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stillword/reading_plan.dart';
 import 'package:stillword/verses.dart';
@@ -6,12 +8,29 @@ import 'package:timezone/data/latest.dart' as database;
 import 'package:timezone/timezone.dart' as tz;
 
 void main() {
+  test('Library expansion preserves every previously shipped reading ID', () {
+    final references =
+        jsonDecode(
+              File(
+                'test/fixtures/shipped-reading-references.json',
+              ).readAsStringSync(),
+            )
+            as List;
+    expect(
+      verses
+          .skip(firstReadingIndex)
+          .take(references.length)
+          .map((v) => v.reference)
+          .toList(),
+      references,
+    );
+  });
   test(
-    '365 unique references and texts, with legacy bookmark IDs preserved',
+    '1095 unique references and texts, with legacy bookmark IDs preserved',
     () {
       final current = verses.skip(firstReadingIndex).toList();
-      expect(current, hasLength(365));
-      expect(current.map((v) => v.reference).toSet(), hasLength(365));
+      expect(current, hasLength(1095));
+      expect(current.map((v) => v.reference).toSet(), hasLength(1095));
       expect(
         verses
             .map(
@@ -30,14 +49,14 @@ void main() {
       final start = DateTime(2026, 10, 6);
       final plan = ReadingPlan.starting(start);
       final ids = <int>[];
-      for (var day = 0; day < 150; day++) {
+      for (var day = 0; day < 400; day++) {
         for (var slot = 0; slot < 3; slot++) {
           final index = plan.indexFor(DateTime(2026, 10, 6 + day), slot);
           if (index != null) ids.add(index);
         }
       }
-      expect(ids, hasLength(365));
-      expect(ids.toSet(), hasLength(365));
+      expect(ids, hasLength(1095));
+      expect(ids.toSet(), hasLength(1095));
       expect(plan.indexFor(start.subtract(const Duration(days: 1)), 0), isNull);
       expect(plan.indexFor(DateTime(2027, 10, 6), 0), isNull);
       expect(ReadingPlan(plan.startDay).indexFor(start, 0), firstReadingIndex);

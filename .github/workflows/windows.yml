@@ -60,10 +60,11 @@ jobs:
           body: |
             Free Windows 10 (2004+) / Windows 11 x64 preview.
             Download Stillword-Windows-Setup.exe and install for your Windows account.
-            Choose morning, afternoon, and night reminders in Rhythm, then send a test notification.
+            Includes private reflections, weekly reading days, searchable saved verses, and comfortable text sizes.
+            Choose once-a-day or three daily reminders in Rhythm, then send a test notification.
             Windows keeps scheduled reminders after closing the window. Keep your PC on and awake, and reopen Stillword at least every 20 days to refill the queue.
             This preview installer is unsigned; Windows may identify the publisher as unknown.
-            Bookmarks and reading history stay on this device. The 365-reading sequence does not automatically repeat.
+            Bookmarks and reading history stay on this device. The 1,095-reading sequence does not automatically repeat.
           files: |
             build/installer/Stillword-Windows-Setup.exe
             build/installer/SHA256SUMS.txt

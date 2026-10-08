@@ -8,7 +8,7 @@ const oldTexts = new Set([...original.matchAll(/'([^'\n]{25,})'/g)].map(m => nor
 function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 // Selected chapters on wisdom, prayer, faith, love, and encouragement.
 const selections = [
-  [18, 'Psalm', [16,19,23,27,34,37,46,63,84,91,100,103,112,116,118,121,125,128,130,131,133,138,139,145,146,147,148,150], 'Prayer'],
+  [18, 'Psalm', Array.from({length:150},(_,i)=>i+1), 'Prayer'],
   [19, 'Proverbs', [3,4,15,16,17,18,19,20,21,22], 'Wisdom'],
   [39, 'Matthew', [5,6,7,11], 'Faith'],
   [42, 'John', [14,15,17], 'Love'],
@@ -41,12 +41,17 @@ for (const [book, name, chapters, theme] of selections) {
 // Fixed ordering: never regenerate with random state or reorder after shipping.
 const first = ['Psalm 23:2', 'Philippians 4:6', 'John 14:27'];
 candidates.sort((a,b) => crypto.createHash('sha256').update(a.reference).digest('hex').localeCompare(crypto.createHash('sha256').update(b.reference).digest('hex')));
-const verses = [...first.map(ref => candidates.find(v=>v.reference===ref)), ...candidates.filter(v=>!first.includes(v.reference))].slice(0,365);
-if (verses.length !== 365 || verses.some(v=>!v)) throw new Error('Incomplete library');
+// Append only: preserve every shipped reference, text, and index.
+const shipped = JSON.parse(fs.readFileSync('tool/source/selected-verses.json','utf8'));
+const shippedReferences = new Set(shipped.map(v=>v.reference));
+const shippedTexts = new Set(shipped.map(v=>normalize(v.text)));
+const verses = [...shipped, ...candidates.filter(v=>!shippedReferences.has(v.reference) && !shippedTexts.has(normalize(v.text)))].slice(0,1095);
+if (verses.length !== 1095 || verses.some(v=>!v)) throw new Error('Incomplete library');
+if (new Set(verses.map(v=>v.reference)).size !== 1095 || new Set(verses.map(v=>normalize(v.text))).size !== 1095) throw new Error('Duplicate readings');
 const dart = s => JSON.stringify(s).replaceAll('$', '\\$');
 const additions = verses.map(v => `  Verse(${dart(v.reference)}, ${dart(v.text)}, ${dart(v.theme)}),`).join('\n');
 const base = original.slice(0, original.lastIndexOf('];'));
-fs.writeFileSync('lib/verses.dart', base.replace('// King James Version: seven days, three verses per day.', '// IDs 0–20 are preserved for legacy bookmarks. New readings start at ID 21.') + additions + '\n];\n\nconst firstReadingIndex = 21;\nconst readingCount = 365;\n');
+fs.writeFileSync('lib/verses.dart', base.replace('// King James Version: seven days, three verses per day.', '// IDs 0–20 are preserved for legacy bookmarks. New readings start at ID 21.') + additions + '\n];\n\nconst firstReadingIndex = 21;\nconst readingCount = 1095;\n');
 fs.writeFileSync('docs/assets/sample-verses.json', JSON.stringify(verses.slice(0,3),null,2)+'\n');
 fs.writeFileSync('tool/source/selected-verses.json', JSON.stringify(verses,null,2)+'\n');
 console.log(`Generated ${verses.length} new unique verses; ${candidates.length} candidates; preserved 21 legacy IDs.`);
